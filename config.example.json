@@ -1,0 +1,9 @@
+{
+    "configure-by-telegram": true,
+    "port":8080,
+    "telegram-token":"token-of-the-bot",
+    "passphrase":"here is a passphrase to identify verified chats",
+    "gitlab-projects": [
+        {"name": "name of project", "token": "secret token used a identifier and verifier"}
+    ]
+}
