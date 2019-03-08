@@ -1,0 +1,4 @@
+#!python
+
+from gwt import main
+main.main()

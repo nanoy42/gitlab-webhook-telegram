@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: gitlab-webhook-telegram
+Version: 1.0
+Summary: A simple bot reacting to gitlab webhook
+Home-page: http://github.com/nanoy42/gitlab-webhook-telegram
+Author: Yoann `Nanoy` Pietri
+Author-email: me@nanoy.fr
+License: GNU General Public License v3.0
+Description: UNKNOWN
+Platform: UNKNOWN
