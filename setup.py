@@ -12,7 +12,4 @@ setup(name='gitlab-webhook-telegram',
       install_requires=['docopt', 'python-telegram-bot'],
       scripts=['bin/gwt'],
       include_package_data=True,
-      cmdclass={
-        'install': PostInstall,
-    },
 )
