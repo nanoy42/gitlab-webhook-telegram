@@ -1,0 +1,5 @@
+include gwt/chats_projects.json
+include gwt/config.json
+include gwt/verified_chats.json
+include LICENSE
+include README.md 

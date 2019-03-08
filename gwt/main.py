@@ -1,13 +1,13 @@
 """
 Gitlab-webhook-telegram
 
-Usage: 
+Usage:
     main.py start
     main.py stop
     main.py restart
     main.py test
 
-Options: 
+Options:
     -v --version    Show version
     -h --help       Display this screen
 """
@@ -16,13 +16,13 @@ import json
 import telegram
 import logging
 import socketserver
-import handlers
+from gwt import handlers
 import os
 import time
 
 from http.server import BaseHTTPRequestHandler
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, MessageHandler, Filters
-from daemon import Daemon
+from gwt.daemon import Daemon
 from docopt import docopt
 from logging.handlers import RotatingFileHandler
 
@@ -70,8 +70,8 @@ class Context:
         self.table = None
         formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         self.logger = logging.getLogger()
-        self.logger.setLevel(logging.DEBUG)    
-        file_handler = RotatingFileHandler('/var/log/gitlab-webhook-telegram.log', 'a', 1000000, 1)
+        self.logger.setLevel(logging.DEBUG)
+        file_handler = RotatingFileHandler('/var/log/gwt/gitlab-webhook-telegram.log', 'a', 1000000, 1)
         file_handler.setLevel(logging.DEBUG)
         file_handler.setFormatter(formatter)
         self.logger.addHandler(file_handler)
@@ -224,7 +224,7 @@ class Bot:
             else:
                 bot.send_message(chat_id=chat_id)
         else:
-            bot.send_message(chat_id=chat_id, text="If you want to configure the bot with telegram, please set the 'configure-by-telegram' option to true in the settings.")   
+            bot.send_message(chat_id=chat_id, text="If you want to configure the bot with telegram, please set the 'configure-by-telegram' option to true in the settings.")
 
     def button(self, bot, update):
         """
@@ -312,7 +312,7 @@ def get_RequestHandler(bot, context):
                 data = self.rfile.read(content_length)
                 body = json.loads(data.decode('utf-8'))
                 if type in HANDLERS:
-                    if token in self.context.table or not self.context.table[token]:
+                    if token in self.context.table and self.context.table[token]:
                         chats = [chat for chat in self.context.table[token] if chat in self.context.verified_chats]
                         HANDLERS[type](body, bot, chats)
                         self._set_headers(200)
@@ -329,11 +329,11 @@ def get_RequestHandler(bot, context):
 
 class AppDaemon(Daemon):
     """
-    A class to daemonize the app. 
+    A class to daemonize the app.
     Override init and run command
     """
-    def __init__(self, pidfile, directory, *args, **kwargs):
-        self.directory = directory
+    def __init__(self, pidfile, *args, **kwargs):
+        self.directory = "/etc/gwt/"
         super(AppDaemon, self).__init__(pidfile, *args, **kwargs)
 
     def run(self):
@@ -366,10 +366,10 @@ class AppDaemon(Daemon):
         logger.info("Server is down")
         os._exit(0)
 
-if __name__== "__main__":
+def main():
     directory = os.path.dirname(os.path.realpath(__file__))+"/"
-    daemon = AppDaemon('/tmp/gitlab-webhook-telegram.pid', directory)
-    arguments = docopt(__doc__, version="Gitlab-webhook-telegram 0.9")
+    daemon = AppDaemon('/tmp/gitlab-webhook-telegram.pid')
+    arguments = docopt(__doc__, version="Gitlab-webhook-telegram 1.0")
     if arguments['start']:
         daemon.start()
     elif arguments['stop']:
@@ -378,3 +378,6 @@ if __name__== "__main__":
         daemon.restart()
     elif arguments['test']:
         daemon.run()
+
+if __name__== "__main__":
+    main()
