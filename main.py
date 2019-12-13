@@ -134,7 +134,6 @@ class Context:
             )
             self.logger.error(str(e))
             sys.exit()
-        print(self.table)
         return self.config, self.verified_chats, self.table
 
     def write_verified_chats(self):
@@ -170,7 +169,7 @@ class Bot:
     def __init__(self, token, context):
         self.token = token
         self.context = context
-        self.updater = Updater(token=self.token)
+        self.updater = Updater(token=self.token, use_context=True)
         self.bot = self.updater.bot
         self.username = self.bot.username
         self.dispatcher = self.updater.dispatcher
@@ -289,7 +288,6 @@ class Bot:
             if chat_id in self.context.verified_chats:
                 self.context.button_mode = MODE_CHANGE_VERBOSITY_1
                 inline_keyboard = []
-                print(self.context.table)
                 projects = [
                     project
                     for project in self.context.config["gitlab-projects"]
@@ -483,8 +481,6 @@ class Bot:
 
     def list_projects(self, bot, update):
         chat_id = update.message.chat_id
-        print(self.context.table)
-        print(chat_id)
         projects = [project for project in self.context.config["gitlab-projects"]
             if (
                 project["token"] in self.context.table
