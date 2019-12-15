@@ -231,7 +231,7 @@ class Bot:
         else:
             bot.send_message(
                 chat_id=chat_id,
-                text="If you want to configure the bot with telegram, please set the 'configure-by-telegram' option to true in the settings.",
+                text="If you want to configure the bot with telegram, please set the 'configure-by-telegram' option to true in the settings. If you don't want to, add the chat id : " + str(chat_id) + "  in the list of verified chats)"
             )
 
     def add_project(self, bot, update):

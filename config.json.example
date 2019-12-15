@@ -1,0 +1,9 @@
+{
+    "configure-by-telegram": true,
+    "port": 8080,
+    "telegram-token": "",
+    "passphrase": "Here we go !",
+    "gitlab-projects": [],
+    "log-file": "./gwt.log",
+    "log-level": "debug"
+}
