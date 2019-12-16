@@ -77,7 +77,7 @@ It looks like
 | `passphrase`              | string                                    | `"Here we go !"` | A passphrase to verify chats when `configure-by-telegram` is set to `true`.                                                    | 
 | `gitlab-projects`         | array (see below)                         | `[]`             | An array of configured projects. See below.                                                                                    |
 | `log-file`                | string                                    | `"./gwt.log"`    | Absolute or relative path to the log file. Make sure the process has the right tro write there.                                |
-| `log-level`               | string (`"debug"`, `"warn"` or `"error"`) | `"error"`        | The log level.                                                                                                                 |
+| `log-level`               | string                                    | `"warning"`      | The log level.                                                                                                                 |
 
 The array of `gitlab-projects` should contain name and token for each project :
 
@@ -85,6 +85,15 @@ The array of `gitlab-projects` should contain name and token for each project :
 |-----------|--------|-----------------------------------------------------------------------|
 | `name`    | string | Pretty name of project                                                |
 | `token`   | string | Token of project. It sould be the same as on the gitlab webhook page. |
+
+The log level should be picked among :
+* info
+* debug
+* warning
+* error
+* critical
+
+More information on the log levels : https://docs.python.org/fr/3/howto/logging.html
 
 A working example :
 
@@ -108,6 +117,8 @@ A working example :
     "log-level": "warn"
 }
 ```
+
+Note : The log-file parameter is ignored when the server is launched with the `python3 manage.py test` command and the logs are printed to the console.
 
 #### 3.2) verified_chats.json
 
@@ -181,7 +192,7 @@ The `main.py` script allows 5 commands : `start`, `restart`, `stop`, `test` and 
 
 The `help` command displays an help message.
 
-The `test` command runs the server but ends with an intureption (ctrl-c) or the user`s session end.
+The `test` command runs the server but ends with an intureption (ctrl-c) or the user`s session end. Also, logs are printed in console and not in file.
 
 The `start`, `restart` and `stop` commands allows to use the a daemonized script. You can easily use those commands to make gwt a service to start when the server boots.
 

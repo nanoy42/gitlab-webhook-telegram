@@ -5,5 +5,5 @@
     "passphrase": "Here we go !",
     "gitlab-projects": [],
     "log-file": "./gwt.log",
-    "log-level": "debug"
+    "log-level": "warning"
 }

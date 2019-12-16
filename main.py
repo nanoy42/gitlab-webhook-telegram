@@ -83,23 +83,15 @@ class Context:
     A class to pass all the parameters and shared values
     """
 
-    def __init__(self, directory):
+    def __init__(self, directory, print_log):
         self.directory = directory
         self.button_mode = MODE_NONE
         self.wait_for_verification = False
         self.config = None
         self.verified_chats = None
         self.table = None
-        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.DEBUG)
-        file_handler = RotatingFileHandler(
-            "/var/log/gwt/gitlab-webhook-telegram.log", "a", 1000000, 1
-        )
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
-        self.logger.addHandler(file_handler)
-
+        self.print_log = print_log
+        
     def get_config(self):
         """
         Load the config file and transform it into a python usable var
@@ -108,17 +100,32 @@ class Context:
             with open(self.directory + "config.json") as config_file:
                 self.config = json.load(config_file)
         except Exception as e:
-            self.logger.error("Impossible to read config.json file. Exception follows")
-            self.logger.error(str(e))
+            print("Impossible to read config.json file. Exception follows")
+            print(str(e))
             sys.exit()
+        
+        #formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        #logging = logging.getLogger()
+        #logging.setLevel(logging.DEBUG)
+        #file_handler = RotatingFileHandler(
+        #    "/var/log/gwt/gitlab-webhook-telegram.log", "a", 1000000, 1
+        #)
+        #file_handler.setLevel(logging.DEBUG)
+        #file_handler.setFormatter(formatter)
+        #logging.addHandler(file_handler)
+        numeric_level = getattr(logging, self.config['log-level'], None)
+        if self.print_log:
+            logging.basicConfig(level=numeric_level, format='%(asctime)s - %(levelname)s - %(message)s')
+        else:
+            logging.basicConfig(filename=self.config['log-file'], filemode='w', level=numeric_level, format='%(asctime)s - %(levelname)s - %(message)s')
         try:
             with open(self.directory + "verified_chats.json") as verified_chats_file:
                 self.verified_chats = json.load(verified_chats_file)
         except Exception as e:
-            self.logger.error(
+            logging.error(
                 "Impossible to read verified_chats.json file. Exception follows"
             )
-            self.logger.error(str(e))
+            logging.error(str(e))
             sys.exit()
         try:
             with open(self.directory + "chats_projects.json") as table_file:
@@ -129,10 +136,10 @@ class Context:
                     for chat_id in tmp[token]:
                         self.table[token][int(chat_id)] = tmp[token][chat_id]
         except Exception as e:
-            self.logger.error(
+            logging.error(
                 "Impossible to read chats_projects.json file. Exception follows"
             )
-            self.logger.error(str(e))
+            logging.error(str(e))
             sys.exit()
         return self.config, self.verified_chats, self.table
 
@@ -549,13 +556,13 @@ def get_RequestHandler(bot, context):
                         HANDLERS[type](body, bot, chats)
                         self._set_headers(200)
                     else:
-                        self.context.logger.info("No chats.")
+                        logging.info("No chats.")
                         self._set_headers(200)
                 else:
-                    self.context.logger.warn("No handler for the event " + type)
+                    logging.warn("No handler for the event " + type)
                     self._set_headers(404)
             else:
-                self.context.logger.warn(
+                logging.warn(
                     "Unauthorized project : token not in config.json"
                 )
                 self._set_headers(403)
@@ -569,31 +576,30 @@ class AppDaemon(Daemon):
     Override init and run command
     """
 
-    def __init__(self, pidfile, directory, *args, **kwargs):
+    def __init__(self, pidfile, directory, print_log, *args, **kwargs):
         self.directory = directory
+        self.print_log = print_log
         super(AppDaemon, self).__init__(pidfile, *args, **kwargs)
 
     def run(self):
         """
         run is called when the daemon starts or restarts
         """
-        context = Context(self.directory)
-        logger = context.logger
-        logger.info("Starting gitlab-webhook-telegram app")
-        logger.info("Getting configuration files")
+        context = Context(self.directory, self.print_log)
         context.get_config()
-        logger.info(
+        logging.info("Starting gitlab-webhook-telegram app")
+        logging.info(
             "config.json, chats_projects.json and verified_chats.json found. Using them for configuration."
         )
-        logger.info("Getting bot with token " + context.config["telegram-token"])
+        logging.info("Getting bot with token " + context.config["telegram-token"])
         try:
             bot = Bot(context.config["telegram-token"], context)
-            logger.info("Bot " + bot.username + " grabbed. Let's go.")
+            logging.info("Bot " + bot.username + " grabbed. Let's go.")
         except Exception as e:
-            logger.error("Failed to grab bot. Stopping here the program.")
-            logger.error("Exception : " + str(e))
+            logging.error("Failed to grab bot. Stopping here the program.")
+            logging.error("Exception : " + str(e))
             sys.exit()
-        context.logger.info(
+        logging.info(
             "Starting server on http://localhost:" + str(context.config["port"])
         )
         try:
@@ -601,17 +607,20 @@ class AppDaemon(Daemon):
             httpd = socketserver.TCPServer(("", context.config["port"]), RequestHandler)
             httpd.serve_forever()
         except KeyboardInterrupt:
-            logger.info("Keyboard interruption received. Shutting down the server")
+            logging.info("Keyboard interruption received. Shutting down the server")
         httpd.server_close()
         httpd.shutdown()
-        logger.info("Server is down")
+        logging.info("Server is down")
         os._exit(0)
 
 
 def main():
-    directory = os.getenv('GWT_DIR', "./")
-    daemon = AppDaemon("/tmp/gitlab-webhook-telegram.pid", directory)
     arguments = docopt(__doc__, version="Gitlab-webhook-telegram 1.1")
+    directory = os.getenv('GWT_DIR', "./")
+    if arguments["test"]:
+        daemon = AppDaemon("/tmp/gitlab-webhook-telegram.pid", directory, True)
+    else:
+        daemon = AppDaemon("/tmp/gitlab-webhook-telegram.pid", directory, False)
     if arguments["start"]:
         daemon.start()
     elif arguments["stop"]:
