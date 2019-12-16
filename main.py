@@ -104,11 +104,16 @@ class Context:
             print(str(e))
             sys.exit()
         
+        if not all (key in self.config for key in ("configure-by-telegram", "telegram-token", "passphrase", "gitlab-projects", "log-file", "log-level")):
+            print("config.json seems to be corrupted. Compare with config.json.example.")
+            sys.exit()
+        
         numeric_level = getattr(logging, self.config['log-level'], None)
         if self.print_log:
             logging.basicConfig(level=numeric_level, format='%(asctime)s - %(levelname)s - %(message)s')
         else:
             logging.basicConfig(filename=self.config['log-file'], filemode='w', level=numeric_level, format='%(asctime)s - %(levelname)s - %(message)s')
+        
         try:
             with open(self.directory + "verified_chats.json") as verified_chats_file:
                 self.verified_chats = json.load(verified_chats_file)
