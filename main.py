@@ -206,11 +206,12 @@ class Bot:
         for id in list:
             self.bot.send_message(id, message)
 
-    def start(self, bot, update):
+    def start(self, update, context):
         """
         Defines the handler for /start command
         """
         chat_id = update.message.chat_id
+        bot = context.bot
         bot.send_message(
             chat_id=chat_id, text="Hi. I'm a simple bot triggered by GitLab webhooks."
         )
@@ -231,14 +232,15 @@ class Bot:
         else:
             bot.send_message(
                 chat_id=chat_id,
-                text="If you want to configure the bot with telegram, please set the 'configure-by-telegram' option to true in the settings. If you don't want to, add the chat id : " + str(chat_id) + "  in the list of verified chats)"
+                text="If you want to configure the bot with telegram, please set the 'configure-by-telegram' option to true in the settings. If you don't want to, add the chat id : " + str(chat_id) + "  in the list of verified chats"
             )
 
-    def add_project(self, bot, update):
+    def add_project(self, update, context):
         """
         Defines the handler for /addProject command
         """
         chat_id = update.message.chat_id
+        bot = context.bot
         if self.context.config["configure-by-telegram"]:
             if chat_id in self.context.verified_chats:
                 self.context.button_mode = MODE_ADD_PROJECT
@@ -279,11 +281,12 @@ class Bot:
                 text="If you want to configure the bot with telegram, please set the 'configure-by-telegram' option to true in the settings.",
             )
 
-    def change_verbosity(self, bot, update):
+    def change_verbosity(self, update, context):
         """
         Defines the handler for /changeVerbosity command
         """
         chat_id = update.message.chat_id
+        bot = context.bot
         if self.context.config["configure-by-telegram"]:
             if chat_id in self.context.verified_chats:
                 self.context.button_mode = MODE_CHANGE_VERBOSITY_1
@@ -323,11 +326,12 @@ class Bot:
                 text="If you want to configure the bot with telegram, please set the 'configure-by-telegram' option to true in the settings.",
             )
 
-    def remove_project(self, bot, update):
+    def remove_project(self, update, context):
         """
         Defines the handler for /removeProject command
         """
         chat_id = update.message.chat_id
+        bot = context.bot
         if self.context.config["configure-by-telegram"]:
             if chat_id in self.context.verified_chats:
                 self.context.button_mode = MODE_REMOVE_PROJECT
@@ -367,11 +371,12 @@ class Bot:
                 text="If you want to configure the bot with telegram, please set the 'configure-by-telegram' option to true in the settings.",
             )
 
-    def button(self, bot, update):
+    def button(self, update, context):
         """
         Defines the handler for a click on button
         """
         query = update.callback_query
+        bot = context.bot
         if self.context.button_mode == MODE_ADD_PROJECT:
             token = query.data
             chat_id = query.message.chat_id
@@ -450,10 +455,11 @@ class Bot:
         else:
             pass
 
-    def message(self, bot, update):
+    def message(self, update, context):
         """
         The handler in case a simple message is posted
         """
+        bot = context.bot
         if self.context.wait_for_verification:
             if update.message.text == self.context.config["passphrase"]:
                 self.context.verified_chats.append(update.message.chat_id)
@@ -468,19 +474,21 @@ class Bot:
                     text="The passphrase is incorrect. Still waiting for verification",
                 )
 
-    def help(self, bot, update):
+    def help(self, update, context):
         """
         Defines the handler for /help command
         """
+        bot = context.bot
         message = "Project gitlab-webhook-telegram v1.1\n"
         if self.context.config["configure-by-telegram"]:
-            message += """You have enabled configuration by telegram. You can use the following commands : \n\n/start : Use to verify the chat\n/listProjects : list projects of the chat\n/addProject : add a project in this chat\n/removeProject : remove a project from this chat\n/changeVerbosity : change the level of information of a chat\n/help : Display this message\n\nIf you want to disable the configuration by telegram, you may change the setting configure-by-telegram to false.'"""
+            message += """You have enabled configuration by telegram. You can use the following commands : \n\n/start : Use to verify the chat\n/listProjects : list projects of the chat\n/addProject : add a project in this chat\n/removeProject : remove a project from this chat\n/changeVerbosity : change the level of information of a chat\n/help : Display this message\n\nIf you want to disable the configuration by telegram, you may change the setting configure-by-telegram to false."""
         else:
             message += "You have disabled configuration by telegram. You can use the /help command to display this message and the /listProjects command to display projects of this chat. If you want to enable the configuration by telegram, you may change the setting configure-by-telegram to true."
         bot.send_message(chat_id=update.message.chat_id, text=message)
 
-    def list_projects(self, bot, update):
+    def list_projects(self, update, context):
         chat_id = update.message.chat_id
+        bot = context.bot
         projects = [project for project in self.context.config["gitlab-projects"]
             if (
                 project["token"] in self.context.table
@@ -496,9 +504,6 @@ class Bot:
             chat_id=chat_id,
             text=message
         )
-
-        
-
 
 
 def get_RequestHandler(bot, context):
