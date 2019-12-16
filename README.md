@@ -66,7 +66,7 @@ It looks like
     "passphrase": "Here we go !",
     "gitlab-projects": [],
     "log-file": "./gwt.log",
-    "log-level": "debug"
+    "log-level": "warning"
 }
 ```
 | Parameter                 | Type                                      | Default value    | Description                                                                                                                    |
@@ -114,7 +114,7 @@ A working example :
         }
     ],
     "log-file": "/var/log/gwt/gwt.log",
-    "log-level": "warn"
+    "log-level": "info"
 }
 ```
 
