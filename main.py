@@ -569,8 +569,8 @@ class AppDaemon(Daemon):
     Override init and run command
     """
 
-    def __init__(self, pidfile, *args, **kwargs):
-        self.directory = "./"
+    def __init__(self, pidfile, directory, *args, **kwargs):
+        self.directory = directory
         super(AppDaemon, self).__init__(pidfile, *args, **kwargs)
 
     def run(self):
@@ -609,8 +609,9 @@ class AppDaemon(Daemon):
 
 
 def main():
-    daemon = AppDaemon("/tmp/gitlab-webhook-telegram.pid")
-    arguments = docopt(__doc__, version="Gitlab-webhook-telegram 1.0")
+    directory = os.getenv('GWT_DIR', "./")
+    daemon = AppDaemon("/tmp/gitlab-webhook-telegram.pid", directory)
+    arguments = docopt(__doc__, version="Gitlab-webhook-telegram 1.1")
     if arguments["start"]:
         daemon.start()
     elif arguments["stop"]:

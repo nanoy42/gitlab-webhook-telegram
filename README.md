@@ -251,7 +251,13 @@ For a group, you have to invite him on the group.
 
 ### I want to put the configuration files elsewhere
 
-If you want to have the configuration files in another directory (say `/etc/gwt/`), it is possible to do so by setting the `GWT_DIR` environment variable. It sould be an abstract path to a readable-writable directory (the script writes ine the configuration files).
+If you want to have the configuration files in another directory (say `/etc/gwt/`), it is possible to do so by setting the `GWT_DIR` environment variable (using `export` command for instance) . It sould be an abstract path to a readable-writable directory (the script writes ine the configuration files). You have to put the final / :
+
+```
+export GWT_DIR=/etc/gwt/
+```
+
+Note : you can use a relative path here but this is strongly discouraged.
 
 ### Verbosities ?
 
