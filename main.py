@@ -104,15 +104,6 @@ class Context:
             print(str(e))
             sys.exit()
         
-        #formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-        #logging = logging.getLogger()
-        #logging.setLevel(logging.DEBUG)
-        #file_handler = RotatingFileHandler(
-        #    "/var/log/gwt/gitlab-webhook-telegram.log", "a", 1000000, 1
-        #)
-        #file_handler.setLevel(logging.DEBUG)
-        #file_handler.setFormatter(formatter)
-        #logging.addHandler(file_handler)
         numeric_level = getattr(logging, self.config['log-level'], None)
         if self.print_log:
             logging.basicConfig(level=numeric_level, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -122,10 +113,10 @@ class Context:
             with open(self.directory + "verified_chats.json") as verified_chats_file:
                 self.verified_chats = json.load(verified_chats_file)
         except Exception as e:
-            logging.error(
+            logging.critical(
                 "Impossible to read verified_chats.json file. Exception follows"
             )
-            logging.error(str(e))
+            logging.critical(str(e))
             sys.exit()
         try:
             with open(self.directory + "chats_projects.json") as table_file:
@@ -136,10 +127,10 @@ class Context:
                     for chat_id in tmp[token]:
                         self.table[token][int(chat_id)] = tmp[token][chat_id]
         except Exception as e:
-            logging.error(
+            logging.critical(
                 "Impossible to read chats_projects.json file. Exception follows"
             )
-            logging.error(str(e))
+            logging.critical(str(e))
             sys.exit()
         return self.config, self.verified_chats, self.table
 
@@ -556,10 +547,10 @@ def get_RequestHandler(bot, context):
                         HANDLERS[type](body, bot, chats)
                         self._set_headers(200)
                     else:
-                        logging.info("No chats.")
+                        logging.warn("No chats.")
                         self._set_headers(200)
                 else:
-                    logging.warn("No handler for the event " + type)
+                    logging.error("No handler for the event " + type)
                     self._set_headers(404)
             else:
                 logging.warn(
@@ -596,8 +587,8 @@ class AppDaemon(Daemon):
             bot = Bot(context.config["telegram-token"], context)
             logging.info("Bot " + bot.username + " grabbed. Let's go.")
         except Exception as e:
-            logging.error("Failed to grab bot. Stopping here the program.")
-            logging.error("Exception : " + str(e))
+            logging.critical("Failed to grab bot. Stopping here the program.")
+            logging.critical("Exception : " + str(e))
             sys.exit()
         logging.info(
             "Starting server on http://localhost:" + str(context.config["port"])
