@@ -29,13 +29,27 @@ You can clone the git repository with
 git clone https://github.com/nanoy42/gitlab-webhook-telegram.git
 ```
 
-Then you need to install the required python modules. The list is in requirements.txt and you can install all requirements with the command :
+Then you need to install the requirements. The recommanded way is to use pipenv.
+
+#### Production
+
+You can install dependencies with : 
 
 ```
-pip3 install -r requirements.txt
+pipenv install --ignore-pipfile
 ```
 
-Note : If you want you can use a virtual environment, but you will have to tweak the rest of tutorial to get it work.
+#### Dev
+
+You can install dependencies and dev dependencies with the command :
+
+```
+pipenv install --dev
+```
+
+#### I don't want to use pipenv
+
+If you don't want to use pipenv, the list of requirements are in the requirements.txt file. Also in the dev-requirements.txt, you have the recommanded requirements for developpement.
 
 ### 3) Configure the app
 

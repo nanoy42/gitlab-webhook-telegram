@@ -1,9 +1,11 @@
-certifi==2019.9.11
-cffi==1.13.2
+-i https://pypi.org/simple
+certifi==2019.11.28
+cffi==1.14.0
 cryptography==2.8
+decorator==4.4.2
 docopt==0.6.2
 future==0.18.2
-pycparser==2.19
-python-telegram-bot==12.2.0
-six==1.13.0
-tornado==6.0.3
+pycparser==2.20
+python-telegram-bot==12.5.1
+six==1.14.0
+tornado==6.0.4
