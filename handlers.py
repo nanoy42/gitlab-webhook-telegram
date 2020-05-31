@@ -31,7 +31,7 @@ def push_handler(data, bot, chats):
             bot.bot.send_message(chat_id=chat[0], text=message)
 
 
-def tag_handler(data, bot, chats, verbosity):
+def tag_handler(data, bot, chats):
     """
     Defines the handler for when tags ar pushed
     """
@@ -43,7 +43,7 @@ def tag_handler(data, bot, chats, verbosity):
         bot.bot.send_message(chat_id=chat[0], text=message)
 
 
-def issue_handler(data, bot, chats, verbosity):
+def issue_handler(data, bot, chats):
     """
     Defines the handler for when a issue is created or changed
     """
@@ -76,7 +76,7 @@ def issue_handler(data, bot, chats, verbosity):
         bot.bot.send_message(chat_id=chat[0], text=message)
 
 
-def note_handler(data, bot, chats, verbosity):
+def note_handler(data, bot, chats):
     """
     Defines the handler for a note (create or update) on commit, merge request, issue or snippet
     """
@@ -103,7 +103,7 @@ def note_handler(data, bot, chats, verbosity):
         bot.bot.send_message(chat_id=chat[0], text=message)
 
 
-def merge_request_handler(data, bot, chats, verbosity):
+def merge_request_handler(data, bot, chats):
     """
     Defines the handler for when a merge request is created or updated
     """
@@ -136,7 +136,7 @@ def merge_request_handler(data, bot, chats, verbosity):
         bot.bot.send_message(chat_id=chat[0], text=message)
 
 
-def job_event_handler(data, bot, chats, verbosity):
+def job_event_handler(data, bot, chats):
     """
     Defines the handler for when a job begin or change
     """
@@ -155,7 +155,7 @@ def job_event_handler(data, bot, chats, verbosity):
         bot.bot.send_message(chat_id=chat[0], text=message)
 
 
-def wiki_event_handler(data, bot, chats, verbosity):
+def wiki_event_handler(data, bot, chats):
     """
     Defines the handler for when a wiki page is created or changed
     """
@@ -167,7 +167,7 @@ def wiki_event_handler(data, bot, chats, verbosity):
         bot.bot.send_message(chat_id=chat[0], text=message)
 
 
-def pipeline_handler(data, bot, chats, verbosity):
+def pipeline_handler(data, bot, chats):
     """
     Defines the hander for when a pipelin begin or change
     """
