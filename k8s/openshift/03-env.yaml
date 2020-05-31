@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  GWT_DIR: /config/
+kind: ConfigMap
+metadata:
+  name: gitlab-bot-env
+  namespace: gitlab-bot
