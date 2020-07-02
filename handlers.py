@@ -15,22 +15,16 @@ def push_handler(data, bot, chats):
     """
     for chat in chats:
         verbosity = chat[1]
-        for commit in data["commits"]:
-            message = (
-                "New commit on project "
-                + data["project"]["name"]
-                + "\nAuthor : "
-                + commit["author"]["name"]
-            )
-            if verbosity != VVVV:
-                message += "\nMessage: " + commit["message"].partition("\n")[0]
-            else:
-                message += "\nMessage: " + commit["message"]
-            if verbosity >= VV:
-                message += "\nUrl : " + commit["url"]
+        url = "{}/compare/{}...{}".format(data["project"]["url"],
+                                          data["project"]["before"],
+                                          data["project"]["after"])
 
-            bot.bot.send_message(chat_id=chat[0], text=message, **other_kwargs)
-
+        message = "[{} pushed on {}]({})".format(data["user_username"],
+                                                 data["project"]["name"],
+                                                 url)
+        commit_detail_key = "title" if verbosity != VVVV else "message"
+        message += ": \n" + "\n".join(["- {}".format(c[commit_detail_key]) for c in data["commits"]])
+        bot.bot.send_message(chat_id=chat[0], text=message, **other_kwargs)
 
 def tag_handler(data, bot, chats):
     """
