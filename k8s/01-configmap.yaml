@@ -1,0 +1,28 @@
+apiVersion: v1
+data: # TODO look at the readme file to fill the json files content below
+  chats_projects.json: |-
+    {
+        "mytoken": {
+            "mychatid": myverbositylevel,
+         }
+    }
+  config.json: |
+    {
+        "configure-by-telegram": true,
+        "port": 8080,
+        "telegram-token": "mytelegramtoken",
+        "passphrase": "mypassphrase",
+        "gitlab-projects": [
+            {
+                "name": "myproject",
+                "token": "mytoken"
+            }
+        ],
+        "log-file": "/dev/null",
+        "log-level" : "Warning"
+    }
+  verified_chats.json: '[chat1, chat2]'
+kind: ConfigMap
+metadata:
+  name: gitlab-bot-config
+  namespace: gitlab-bot

@@ -7,6 +7,7 @@ VV = 1
 VVV = 2
 VVVV = 3
 
+other_kwargs = {"disable_web_page_preview": True}
 
 def push_handler(data, bot, chats):
     """
@@ -14,24 +15,18 @@ def push_handler(data, bot, chats):
     """
     for chat in chats:
         verbosity = chat[1]
-        for commit in data["commits"]:
-            message = (
-                "New commit on project "
-                + data["project"]["name"]
-                + "\nAuthor : "
-                + commit["author"]["name"]
-            )
-            if verbosity != VVVV:
-                message += "\nMessage: " + commit["message"].partition("\n")[0]
-            else:
-                message += "\nMessage: " + commit["message"]
-            if verbosity >= VV:
-                message += "\nUrl : " + commit["url"]
+        url = "{}/compare/{}...{}".format(data["project"]["url"],
+                                          data["project"]["before"],
+                                          data["project"]["after"])
 
-            bot.bot.send_message(chat_id=chat[0], text=message)
+        message = "[{} pushed on {}]({})".format(data["user_username"],
+                                                 data["project"]["name"],
+                                                 url)
+        commit_detail_key = "title" if verbosity != VVVV else "message"
+        message += ": \n" + "\n".join(["- {}".format(c[commit_detail_key]) for c in data["commits"]])
+        bot.bot.send_message(chat_id=chat[0], text=message, **other_kwargs)
 
-
-def tag_handler(data, bot, chats, verbosity):
+def tag_handler(data, bot, chats):
     """
     Defines the handler for when tags ar pushed
     """
@@ -40,10 +35,10 @@ def tag_handler(data, bot, chats, verbosity):
         message = "New tag or tag removed on project " + data["project"]["name"]
         if verbosity >= VV:
             message += ". See " + data["project"]["web_url"] + "/tags for more information."
-        bot.bot.send_message(chat_id=chat[0], text=message)
+        bot.bot.send_message(chat_id=chat[0], text=message, **other_kwargs)
 
 
-def issue_handler(data, bot, chats, verbosity):
+def issue_handler(data, bot, chats):
     """
     Defines the handler for when a issue is created or changed
     """
@@ -73,10 +68,10 @@ def issue_handler(data, bot, chats, verbosity):
             due_date = oa["due_date"]
             if due_date:
                 message += "\nDue date : " + due_date
-        bot.bot.send_message(chat_id=chat[0], text=message)
+        bot.bot.send_message(chat_id=chat[0], text=message, **other_kwargs)
 
 
-def note_handler(data, bot, chats, verbosity):
+def note_handler(data, bot, chats):
     """
     Defines the handler for a note (create or update) on commit, merge request, issue or snippet
     """
@@ -100,10 +95,10 @@ def note_handler(data, bot, chats, verbosity):
         message += "\nNote : " + data["object_attributes"]["note"]
         if verbosity >= VV:
             message += "\nURL : " + data["object_attributes"]["url"]
-        bot.bot.send_message(chat_id=chat[0], text=message)
+        bot.bot.send_message(chat_id=chat[0], text=message, **other_kwargs)
 
 
-def merge_request_handler(data, bot, chats, verbosity):
+def merge_request_handler(data, bot, chats):
     """
     Defines the handler for when a merge request is created or updated
     """
@@ -133,10 +128,10 @@ def merge_request_handler(data, bot, chats, verbosity):
                 message += "\nAssignee : " + data["assignee"]["username"]
         if verbosity >= VV:
             message += "\nURL : " + oa["url"]
-        bot.bot.send_message(chat_id=chat[0], text=message)
+        bot.bot.send_message(chat_id=chat[0], text=message, **other_kwargs)
 
 
-def job_event_handler(data, bot, chats, verbosity):
+def job_event_handler(data, bot, chats):
     """
     Defines the handler for when a job begin or change
     """
@@ -152,10 +147,10 @@ def job_event_handler(data, bot, chats, verbosity):
         )
         if verbosity >= VV:
             message += "\nURL : " + data["repository"]["homepage"] + "/-/jobs"
-        bot.bot.send_message(chat_id=chat[0], text=message)
+        bot.bot.send_message(chat_id=chat[0], text=message, **other_kwargs)
 
 
-def wiki_event_handler(data, bot, chats, verbosity):
+def wiki_event_handler(data, bot, chats):
     """
     Defines the handler for when a wiki page is created or changed
     """
@@ -164,10 +159,10 @@ def wiki_event_handler(data, bot, chats, verbosity):
         message = "New wiki page or wiki page updated on project " + data["project"]["name"]
         if verbosity >= VV:
             message += "\nURL : " + data["wiki"]["web_url"]
-        bot.bot.send_message(chat_id=chat[0], text=message)
+        bot.bot.send_message(chat_id=chat[0], text=message, **other_kwargs)
 
 
-def pipeline_handler(data, bot, chats, verbosity):
+def pipeline_handler(data, bot, chats):
     """
     Defines the hander for when a pipelin begin or change
     """
@@ -181,4 +176,4 @@ def pipeline_handler(data, bot, chats, verbosity):
         )
         if verbosity >= VV:
             message += "\nURL : " + data["project"]["web_url"] + "/pipelines"
-        bot.bot.send_message(chat_id=chat[0], text=message)
+        bot.bot.send_message(chat_id=chat[0], text=message, **other_kwargs)

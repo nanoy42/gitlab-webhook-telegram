@@ -1,0 +1,13 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: gitlab-bot-route
+  namespace: gitlab-bot
+spec:
+  host: # TODO change to your needs
+  to:
+    kind: Service
+    name: gitlab-bot-svc
+    weight: 100
+  wildcardPolicy: None
+
